@@ -9,6 +9,8 @@ unpaved paths** over paved roads.
 
 - 🗺️ Interactive map (Leaflet + OpenStreetMap) — click anywhere or drag the
   marker to set the start, search for a place, or use your current location
+- 📌 Opens at a state-level view of your approximate location on load
+  (IP-based, via [geojs.io](https://www.geojs.io) — no permission prompt)
 - 📏 Target distance from 1 to 30 km via slider
 - 🌲 "Prefer trails & unpaved paths" toggle
 - 🔄 Every generation picks a new direction, so you can keep regenerating
@@ -53,4 +55,5 @@ without further configuration.
 
 - Routing: [BRouter](https://brouter.de)
 - Geocoding: [Nominatim](https://nominatim.org)
+- IP geolocation: [GeoJS](https://www.geojs.io)
 - Map data & tiles: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors
