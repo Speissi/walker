@@ -1,1 +1,0 @@
-{"root":["./src/App.tsx","./src/main.tsx","./src/components/MapView.tsx","./src/lib/brouter.ts","./src/lib/geo.ts","./src/lib/geocode.ts","./src/lib/gpx.ts","./src/lib/loop.ts"],"version":"5.9.3"}
