@@ -1,14 +1,50 @@
-import type { LatLng } from './geo'
+import { haversineMeters, type LatLng } from './geo'
 
 const BROUTER_URL = 'https://brouter.de/brouter'
 
+type Position = [number, number, number?]
+
 export interface RouteResult {
   /** Route geometry as [lon, lat, ele?] positions. */
-  coordinates: [number, number, number?][]
+  coordinates: Position[]
   /** Total length in meters. */
   distance: number
   /** Filtered total ascent in meters. */
   ascent: number
+}
+
+const samePoint = (a: Position, b: Position) => a[0] === b[0] && a[1] === b[1]
+
+/**
+ * Remove out-and-back spurs: when a generated waypoint snaps to a point off
+ * the natural loop (e.g. into a dead-end side street), the route walks in,
+ * makes a 180° turn at the waypoint and walks back out over the exact same
+ * nodes. Repeatedly collapsing X,Y,X patterns removes the whole spur while
+ * keeping the track connected, because whatever preceded the spur was
+ * already directly connected to whatever follows it.
+ */
+function removeUTurnSpurs(coords: Position[]): Position[] {
+  const out: Position[] = []
+  for (const c of coords) {
+    if (out.length > 0 && samePoint(out[out.length - 1], c)) continue
+    if (out.length > 1 && samePoint(out[out.length - 2], c)) {
+      out.pop()
+      continue
+    }
+    out.push(c)
+  }
+  return out
+}
+
+function polylineMeters(coords: Position[]): number {
+  let total = 0
+  for (let i = 1; i < coords.length; i++) {
+    total += haversineMeters(
+      { lat: coords[i - 1][1], lng: coords[i - 1][0] },
+      { lat: coords[i][1], lng: coords[i][0] },
+    )
+  }
+  return total
 }
 
 // The hiking profile was renamed from hiking-beta to hiking-mountain in
@@ -37,9 +73,17 @@ async function requestRoute(
   if (!feature?.geometry?.coordinates?.length) {
     throw new Error('No route found between the generated waypoints.')
   }
+  const raw: Position[] = feature.geometry.coordinates
+  const coordinates = removeUTurnSpurs(raw)
+  // BRouter's track-length covers the full track including spurs; after
+  // trimming, measure the remaining geometry instead.
+  const distance =
+    coordinates.length === raw.length
+      ? Number.parseInt(feature.properties?.['track-length'] ?? '0', 10)
+      : Math.round(polylineMeters(coordinates))
   return {
-    coordinates: feature.geometry.coordinates,
-    distance: Number.parseInt(feature.properties?.['track-length'] ?? '0', 10),
+    coordinates,
+    distance,
     ascent: Number.parseInt(feature.properties?.['filtered ascend'] ?? '0', 10) || 0,
   }
 }

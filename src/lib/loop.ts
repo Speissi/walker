@@ -6,7 +6,7 @@ export interface LoopResult {
   waypoints: LatLng[]
 }
 
-const NUM_WAYPOINTS = 3
+const NUM_WAYPOINTS = 4
 const MAX_ITERATIONS = 4
 const ACCEPTABLE_ERROR = 0.08 // accept routes within 8% of the target length
 
