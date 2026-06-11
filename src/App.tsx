@@ -1,8 +1,9 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import MapView from './components/MapView'
 import { generateLoop } from './lib/loop'
 import { downloadGpx } from './lib/gpx'
 import { geocode } from './lib/geocode'
+import { approximateLocation } from './lib/iplocate'
 import {
   estimateWalkingMinutes,
   formatDistance,
@@ -24,11 +25,29 @@ export default function App() {
   const [searching, setSearching] = useState(false)
   const [flyTo, setFlyTo] = useState<{ point: LatLng; zoom: number } | null>(null)
   const abortRef = useRef<AbortController | null>(null)
+  // Once the user has picked a point or searched, the IP-based startup
+  // recentering must not yank the map away from where they are working.
+  const userNavigatedRef = useRef(false)
 
   const handleSetStart = useCallback((point: LatLng) => {
+    userNavigatedRef.current = true
     setStart(point)
     setRoute(null)
     setStatus('idle')
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    approximateLocation().then((point) => {
+      // IP positions are often off by a city or two, so stay at a
+      // state-level zoom and let the user narrow down from there.
+      if (point && !cancelled && !userNavigatedRef.current) {
+        setFlyTo({ point, zoom: 7 })
+      }
+    })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const generate = async () => {
@@ -64,6 +83,7 @@ export default function App() {
     try {
       const result = await geocode(query)
       if (result) {
+        userNavigatedRef.current = true
         setFlyTo({ point: result.point, zoom: 14 })
       } else {
         setStatus('error')
