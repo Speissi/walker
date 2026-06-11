@@ -196,6 +196,22 @@ footer a {
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
 }
 
+.dance-party {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: min(220px, 30vh);
+  pointer-events: none;
+  z-index: 1100; /* above Leaflet panes and controls (~1000) */
+}
+
+.dance-party canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 @media (max-width: 720px) {
   .app {
     flex-direction: column-reverse;
