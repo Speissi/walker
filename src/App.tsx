@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import MapView from './components/MapView'
+import DanceParty from './components/DanceParty'
 import { generateLoop } from './lib/loop'
 import { downloadGpx } from './lib/gpx'
 import { geocode } from './lib/geocode'
@@ -13,6 +14,8 @@ import {
 import type { RouteResult } from './lib/brouter'
 
 type Status = 'idle' | 'loading' | 'error'
+
+const NOICE = new URLSearchParams(window.location.search).has('noice')
 
 export default function App() {
   const [start, setStart] = useState<LatLng | null>(null)
@@ -219,6 +222,8 @@ export default function App() {
       <main className="map-wrap">
         <MapView start={start} route={route} flyTo={flyTo} onSetStart={handleSetStart} />
       </main>
+
+      {NOICE && <DanceParty />}
     </div>
   )
 }
