@@ -34,6 +34,17 @@ export function destinationPoint(origin: LatLng, bearingDeg: number, distanceM: 
   }
 }
 
+/** Great-circle distance in meters between two points. */
+export function haversineMeters(a: LatLng, b: LatLng): number {
+  const phi1 = toRad(a.lat)
+  const phi2 = toRad(b.lat)
+  const dPhi = toRad(b.lat - a.lat)
+  const dLambda = toRad(b.lng - a.lng)
+  const h =
+    Math.sin(dPhi / 2) ** 2 + Math.cos(phi1) * Math.cos(phi2) * Math.sin(dLambda / 2) ** 2
+  return 2 * EARTH_RADIUS_M * Math.asin(Math.sqrt(h))
+}
+
 export function formatDistance(meters: number): string {
   return meters < 1000 ? `${Math.round(meters)} m` : `${(meters / 1000).toFixed(1)} km`
 }
