@@ -112,6 +112,15 @@ button:disabled {
   accent-color: #e8590c;
 }
 
+.field select {
+  padding: 9px 12px;
+  border: 1px solid #2e5a4c;
+  border-radius: 8px;
+  background: #0e261f;
+  color: inherit;
+  font-size: 0.92rem;
+}
+
 .checkbox {
   display: flex;
   align-items: center;
@@ -144,8 +153,12 @@ button:disabled {
   padding: 14px;
 }
 
+.stats .wide,
 .downloads {
   grid-column: 1 / -1;
+}
+
+.downloads {
   display: flex;
   gap: 8px;
 }
@@ -191,6 +204,27 @@ footer a {
 .map {
   height: 100%;
   width: 100%;
+}
+
+.route-flow {
+  stroke-dasharray: 2 14;
+  stroke-linecap: round;
+  animation: route-flow 1s linear infinite;
+}
+
+@keyframes route-flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -16; /* one full dash period per cycle, moving forward */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-flow {
+    animation: none;
+  }
 }
 
 .start-marker {

@@ -21,6 +21,7 @@ const NOICE = new URLSearchParams(window.location.search).has('noice')
 export default function App() {
   const [start, setStart] = useState<LatLng | null>(null)
   const [distanceKm, setDistanceKm] = useState(5)
+  const [direction, setDirection] = useState<'random' | number>('random')
   const [preferUnpaved, setPreferUnpaved] = useState(false)
   const [route, setRoute] = useState<RouteResult | null>(null)
   const [status, setStatus] = useState<Status>('idle')
@@ -62,11 +63,15 @@ export default function App() {
     setStatus('loading')
     setError('')
     try {
+      // Jitter a chosen heading by up to ±22.5° so "generate another loop"
+      // still produces variety without abandoning the chosen direction.
+      const bearing =
+        direction === 'random' ? undefined : direction + (Math.random() - 0.5) * 45
       const result = await generateLoop(
         start,
         distanceKm * 1000,
         preferUnpaved,
-        undefined,
+        bearing,
         controller.signal,
       )
       setRoute(result.route)
@@ -167,6 +172,26 @@ export default function App() {
           />
         </label>
 
+        <label className="field">
+          <span>Direction from start</span>
+          <select
+            value={String(direction)}
+            onChange={(e) =>
+              setDirection(e.target.value === 'random' ? 'random' : Number(e.target.value))
+            }
+          >
+            <option value="random">🎲 Random</option>
+            <option value="0">⬆️ North</option>
+            <option value="45">↗️ North-east</option>
+            <option value="90">➡️ East</option>
+            <option value="135">↘️ South-east</option>
+            <option value="180">⬇️ South</option>
+            <option value="225">↙️ South-west</option>
+            <option value="270">⬅️ West</option>
+            <option value="315">↖️ North-west</option>
+          </select>
+        </label>
+
         <label className="checkbox">
           <input
             type="checkbox"
@@ -201,6 +226,16 @@ export default function App() {
               <span className="stat-label">Est. time</span>
               <span className="stat-value">{formatDuration(walkingMinutes)}</span>
             </div>
+            <button
+              className="secondary wide"
+              type="button"
+              onClick={() =>
+                setRoute({ ...route, coordinates: [...route.coordinates].reverse() })
+              }
+              title="Walk the same loop the other way around"
+            >
+              ⇄ Reverse walking direction
+            </button>
             <div className="downloads">
               <button
                 className="secondary"
