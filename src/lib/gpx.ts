@@ -1,4 +1,5 @@
 import type { RouteResult } from './brouter'
+import { downloadBlob, safeFilename } from './download'
 
 function escapeXml(s: string): string {
   return s.replace(/[<>&'"]/g, (c) => `&#${c.charCodeAt(0)};`)
@@ -29,11 +30,5 @@ ${points}
 }
 
 export function downloadGpx(route: RouteResult, name: string): void {
-  const blob = new Blob([routeToGpx(route, name)], { type: 'application/gpx+xml' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${name.replace(/[^\w.-]+/g, '-')}.gpx`
-  a.click()
-  URL.revokeObjectURL(url)
+  downloadBlob(routeToGpx(route, name), 'application/gpx+xml', `${safeFilename(name)}.gpx`)
 }

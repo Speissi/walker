@@ -22,7 +22,7 @@ export default function MapView({ start, route, flyTo, onSetStart }: MapViewProp
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
   const startMarkerRef = useRef<L.Marker | null>(null)
-  const routeLayerRef = useRef<L.Polyline | null>(null)
+  const routeLayerRef = useRef<L.LayerGroup | null>(null)
   const onSetStartRef = useRef(onSetStart)
   onSetStartRef.current = onSetStart
 
@@ -67,10 +67,18 @@ export default function MapView({ start, route, flyTo, onSetStart }: MapViewProp
     routeLayerRef.current = null
     if (route) {
       const latlngs = route.coordinates.map(([lon, lat]) => [lat, lon] as [number, number])
-      const line = L.polyline(latlngs, { color: '#e8590c', weight: 5, opacity: 0.85 })
-      line.addTo(map)
-      routeLayerRef.current = line
-      map.fitBounds(line.getBounds(), { padding: [40, 40] })
+      const base = L.polyline(latlngs, { color: '#e8590c', weight: 5, opacity: 0.85 })
+      // Dashes march along the path in the direction of travel, so the
+      // walking direction (and reversing it) is visible at a glance.
+      const flow = L.polyline(latlngs, {
+        color: '#fff',
+        weight: 2.5,
+        opacity: 0.9,
+        className: 'route-flow',
+      })
+      const group = L.layerGroup([base, flow]).addTo(map)
+      routeLayerRef.current = group
+      map.fitBounds(base.getBounds(), { padding: [40, 40] })
     }
   }, [route])
 
