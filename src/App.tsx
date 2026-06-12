@@ -3,6 +3,7 @@ import MapView from './components/MapView'
 import DanceParty from './components/DanceParty'
 import { generateLoop } from './lib/loop'
 import { downloadGpx } from './lib/gpx'
+import { downloadFitCourse } from './lib/fit'
 import { geocode } from './lib/geocode'
 import { approximateLocation } from './lib/iplocate'
 import {
@@ -200,13 +201,23 @@ export default function App() {
               <span className="stat-label">Est. time</span>
               <span className="stat-value">{formatDuration(walkingMinutes)}</span>
             </div>
-            <button
-              className="secondary"
-              type="button"
-              onClick={() => downloadGpx(route, `walker-loop-${distanceKm}km`)}
-            >
-              ⬇️ Download GPX
-            </button>
+            <div className="downloads">
+              <button
+                className="secondary"
+                type="button"
+                onClick={() => downloadFitCourse(route, `Walker ${distanceKm} km loop`)}
+                title="Garmin course file: import in Garmin Connect to sync to your watch"
+              >
+                ⬇️ FIT (Garmin)
+              </button>
+              <button
+                className="secondary"
+                type="button"
+                onClick={() => downloadGpx(route, `walker-loop-${distanceKm}km`)}
+              >
+                ⬇️ GPX
+              </button>
+            </div>
           </div>
         )}
 

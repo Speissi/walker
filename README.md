@@ -16,7 +16,9 @@ unpaved paths** over paved roads.
 - 🔄 Every generation picks a new direction, so you can keep regenerating
   until you like the loop
 - 📊 Distance, total ascent and estimated walking time (Naismith's rule)
-- ⬇️ GPX export for your watch or phone
+- ⬇️ Export as **FIT course** (Garmin's native format — import in Garmin
+  Connect and it syncs to your watch with virtual partner and ClimbPro
+  support) or **GPX** for everything else
 
 ## How it works
 
